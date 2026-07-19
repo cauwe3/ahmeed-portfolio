@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Evolution of Artificial Intelligence · 1950–2026</title>
+<meta name="description" content="An interactive timeline and analysis of the history of artificial intelligence, 1950–2026 — from the Turing Test to Agentic AI. By Ahmeed Akinlade.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4F2EC;
+    --card:#FCFBF8;
+    --ink:#16151B;
+    --muted:#6E6A73;
+    --plum:#6B2B57;
+    --orchid:#A23E86;
+    --line:#E4DFD5;
+    --live:#2E9E6B;
+    --frost:#3E6B8C;      /* AI winter — cool slate blue */
+    --frost-soft:#6E9BBB;
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Inter",system-ui,sans-serif;
+    font-size:17px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+  a{color:inherit}
+
+  /* ---- utility label (mono) ---- */
+  .tag{
+    font-family:"JetBrains Mono",monospace;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--plum);display:inline-flex;align-items:center;gap:8px;
+  }
+  .tag::before{content:"";width:22px;height:1px;background:var(--plum);display:inline-block}
+
+  h1,h2,h3{font-family:"Fraunces",serif;font-weight:500;line-height:1.08;letter-spacing:-.01em;text-wrap:balance}
+
+  /* ---- scroll progress bar ---- */
+  .scrollbar{position:fixed;top:0;left:0;height:3px;width:0;z-index:50;
+    background:linear-gradient(90deg,var(--plum),var(--orchid));transition:width .1s linear}
+
+  /* ---- top nav ---- */
+  header.nav{
+    position:sticky;top:0;z-index:30;
+    background:rgba(244,242,236,.86);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:20px}
+  .brand{font-family:"JetBrains Mono",monospace;font-size:14px;letter-spacing:.02em;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:9px;white-space:nowrap}
+  .brand b{color:var(--plum)}
+  .brand .back{color:var(--muted);transition:color .2s}
+  .brand:hover .back{color:var(--plum)}
+  .navlinks{display:flex;gap:22px;font-size:13.5px}
+  .navlinks a{text-decoration:none;color:var(--muted);transition:color .2s;font-family:"JetBrains Mono",monospace;letter-spacing:.02em}
+  .navlinks a:hover,.navlinks a.active{color:var(--plum)}
+  @media(max-width:820px){.navlinks{display:none}}
+
+  /* ---- hero ---- */
+  .hero{position:relative;padding:96px 0 72px;overflow:hidden;border-bottom:1px solid var(--line)}
+  #ambient{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.55}
+  .hero .wrap{position:relative;z-index:1}
+  .hero h1{font-size:clamp(2.6rem,7vw,5rem);margin:22px 0 20px;max-width:16ch}
+  .hero .sub{font-family:"JetBrains Mono",monospace;font-size:clamp(13px,2.2vw,15px);letter-spacing:.08em;color:var(--plum);text-transform:uppercase}
+  .hero .lede{font-size:1.15rem;color:var(--muted);max-width:52ch;margin:26px 0 40px}
+  .hero .lede b{color:var(--ink);font-weight:600}
+
+  .scrollcue{margin-top:44px;font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.1em;color:var(--muted);display:inline-flex;align-items:center;gap:10px}
+  .scrollcue .arr{display:inline-block;animation:bob 1.8s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+  /* ---- legend ---- */
+  .legend{padding:22px 0;border-bottom:1px solid var(--line);background:var(--card)}
+  .legend .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center}
+  .legend .lg-title{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .lg{display:inline-flex;align-items:center;gap:9px;font-size:13.5px}
+  .lg .sw{width:13px;height:13px;border-radius:3px}
+  .lg.spring .sw{background:var(--plum)}
+  .lg.winter .sw{background:var(--frost)}
+
+  /* ---- timeline ---- */
+  .timeline{position:relative;padding:60px 0 40px}
+  .tl-inner{position:relative;max-width:var(--maxw);margin:0 auto;padding:0 28px 0 calc(28px + 46px)}
+  /* spine */
+  .spine{position:absolute;left:44px;top:8px;bottom:60px;width:2px;background:var(--line)}
+  .spine .fill{position:absolute;left:0;top:0;width:100%;height:0;
+    background:linear-gradient(180deg,var(--plum),var(--orchid));border-radius:2px}
+  @media(max-width:640px){
+    .tl-inner{padding-left:calc(20px + 30px)}
+    .spine{left:30px}
+    .wrap{padding:0 20px}
+  }
+
+  /* era header */
+  .era{position:relative;margin:0 0 8px;padding:34px 0 6px}
+  .era:first-child{padding-top:6px}
+  .era-yr{font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.06em;color:var(--frost);margin-bottom:6px}
+  .era.warm .era-yr{color:var(--orchid)}
+  .era h2{font-size:clamp(1.5rem,3.4vw,2.15rem);max-width:24ch}
+  .era-node{position:absolute;left:-37px;top:38px;width:14px;height:14px;border-radius:50%;
+    background:var(--plum);border:3px solid var(--paper);box-shadow:0 0 0 1px var(--line);z-index:2}
+  @media(max-width:640px){.era-node{left:-27px}}
+
+  /* event node */
+  .node{position:relative;margin:20px 0}
+  .node::before{content:"";position:absolute;left:-34px;top:22px;width:9px;height:9px;border-radius:50%;
+    background:var(--paper);border:2px solid var(--plum);z-index:2}
+  .node.winter::before{border-color:var(--frost)}
+  @media(max-width:640px){.node::before{left:-24px}}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-left:3px solid var(--plum);
+    border-radius:4px;padding:20px 24px;transition:box-shadow .25s,transform .25s;
+  }
+  .card:hover{box-shadow:0 16px 36px -26px rgba(22,21,27,.4);transform:translateY(-2px)}
+  .card.winter{border-left-color:var(--frost)}
+  .card .yr{font-family:"JetBrains Mono",monospace;font-size:12.5px;letter-spacing:.05em;color:var(--plum);display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .card.winter .yr{color:var(--frost)}
+  .card .phase{font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:2px;background:rgba(107,43,87,.09);color:var(--plum)}
+  .card.winter .phase{background:rgba(62,107,140,.11);color:var(--frost)}
+  .card h3{font-size:1.22rem;margin:9px 0 8px;font-weight:600}
+  .card p{color:var(--muted);font-size:15.5px;line-height:1.6;max-width:64ch}
+  .card p b{color:var(--ink);font-weight:600}
+  .card .stat{color:var(--orchid);font-weight:600;font-family:"JetBrains Mono",monospace;font-size:.92em}
+  .card.winter .stat{color:var(--frost)}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---- quote pull ---- */
+  .quote{padding:70px 0}
+  .quote .vp{background:var(--plum);color:#F4F2EC;border-radius:4px;padding:56px 48px;position:relative;overflow:hidden}
+  .quote .tag{color:#E9B8D6}
+  .quote .tag::before{background:#E9B8D6}
+  .quote blockquote{font-family:"Fraunces",serif;font-weight:400;font-size:clamp(1.4rem,3.2vw,2.15rem);line-height:1.32;margin-top:20px;max-width:26ch}
+  .quote blockquote b{color:#fff;font-weight:600}
+  .quote cite{display:block;margin-top:24px;font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.06em;font-style:normal;color:#E9B8D6}
+  .quote .glow{position:absolute;right:-90px;bottom:-130px;width:360px;height:360px;background:radial-gradient(circle,var(--orchid),transparent 70%);opacity:.55}
+  @media(max-width:640px){.quote .vp{padding:40px 26px}}
+
+  /* ---- references ---- */
+  .refs{padding:56px 0;border-top:1px solid var(--line)}
+  .refs .sec-head{margin-bottom:28px}
+  .refs .sec-head h2{font-size:clamp(1.6rem,3vw,2.2rem);margin-top:12px}
+  .reflist{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+  .reflist a{background:var(--card);padding:18px 20px;text-decoration:none;display:flex;gap:12px;transition:background .2s}
+  .reflist a:hover{background:var(--paper)}
+  .reflist .n{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--plum);flex-shrink:0}
+  .reflist .u{font-size:14px;color:var(--muted);word-break:break-word;line-height:1.5}
+  .reflist a:hover .u{color:var(--ink)}
+
+  /* ---- closer ---- */
+  .closer{padding:90px 0 70px;text-align:center;border-top:1px solid var(--line);position:relative;overflow:hidden}
+  .closer .eyebrow{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--plum)}
+  .closer h2{font-size:clamp(2.4rem,6vw,4rem);margin:16px 0 22px}
+  .closer p{color:var(--muted);max-width:44ch;margin:0 auto 34px}
+  .closer .back-btn{font-family:"Inter";font-size:15px;font-weight:500;text-decoration:none;padding:12px 22px;border-radius:2px;background:var(--plum);color:#fff;display:inline-flex;align-items:center;gap:9px;transition:.2s}
+  .closer .back-btn:hover{background:var(--orchid)}
+
+  footer{border-top:1px solid var(--line);padding:26px 0;font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted)}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+  @media(prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none}
+    .scrollcue .arr{animation:none}
+    html{scroll-behavior:auto}
+  }
+  :focus-visible{outline:2px solid var(--plum);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<div class="scrollbar" id="scrollbar"></div>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="back">&larr;</span> A<b>.</b>Akinlade</a>
+    <nav class="navlinks" id="navlinks">
+      <a href="#e1">1950s</a>
+      <a href="#e2">Winters</a>
+      <a href="#e5">Foundations</a>
+      <a href="#e6">Breakthrough</a>
+      <a href="#e7">LLMs</a>
+      <a href="#e8">Agentic</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <canvas id="ambient" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <span class="tag">A History of AI · 1950 — 2026</span>
+    <div class="sub" style="margin-top:20px">The Evolution of</div>
+    <h1>Artificial Intelligence</h1>
+    <div class="sub">From the Turing Test to Agentic AI &nbsp;·&nbsp; 1950&ndash;2026</div>
+    <p class="lede">Seventy-six years in one scroll — the <b>ideas, the breakthroughs, and the two long winters</b> that shaped how machines learned to think. Warm markers are springs of progress; <b>cool markers are the AI winters</b> when the funding and the faith ran out.</p>
+
+    <div class="scrollcue"><span class="arr">&darr;</span> SCROLL THROUGH THE DECADES</div>
+  </div>
+</section>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="wrap">
+    <span class="lg-title">Reading the timeline</span>
+    <span class="lg spring"><span class="sw"></span> Spring — progress &amp; breakthroughs</span>
+    <span class="lg winter"><span class="sw"></span> AI Winter — funding cuts &amp; disillusion</span>
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<div class="timeline">
+  <div class="tl-inner">
+    <div class="spine"><div class="fill" id="spinefill"></div></div>
+
+    <!-- ERA 1 -->
+    <div class="era warm reveal" id="e1">
+      <span class="era-node"></span>
+      <div class="era-yr">1950 – 1959</div>
+      <h2>The Birth of Artificial Intelligence</h2>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">1950 <span class="phase">Foundational idea</span></div>
+        <h3>The Turing Test</h3>
+        <p>Alan Turing — the codebreaker who cracked Nazi Enigma — asks in <em>"Computing Machinery and Intelligence"</em>: can a machine's conversation be indistinguishable from a human's? His <b>"Imitation Game"</b> set AI's goalpost for the next 25 years.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">1957 – 1958 <span class="phase">Learning machine</span></div>
+        <h3>The Perceptron</h3>
+        <p>Frank Rosenblatt at Cornell builds a Navy-funded physical machine with <span class="stat">400 photocells</span> as a "retina." It learned to classify patterns by trial and error — <b>no hard-coded rules</b>. The press hype about conscious machines proves today's AI hype isn't new.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">1959 <span class="phase">Term coined</span></div>
+        <h3>"Machine Learning" is named</h3>
+        <p>Arthur Samuel names programs that improve through experience — <b>learning from data</b> instead of being explicitly told what to do.</p>
+      </div>
+    </div>
+
+    <!-- ERA 2 -->
+    <div class="era reveal" id="e2">
+      <span class="era-node" style="background:var(--frost)"></span>
+      <div class="era-yr">1960s – early 1980s</div>
+      <h2>Early Progress &amp; the First AI Winter</h2>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">1960s <span class="phase">Boom</span></div>
+        <h3>Rapid early progress</h3>
+        <p>AI research boomed. Programs solved math and logic; <b>expert systems</b> mimicked human experts in medicine and engineering; games and language translation advanced — and governments and companies poured in funding.</p>
+      </div>
+    </div>
+    <div class="node winter reveal">
+      <div class="card winter">
+        <div class="yr">mid-1970s <span class="phase">First AI Winter</span></div>
+        <h3>Why the winter came</h3>
+        <p>Computers were too slow, digital data too scarce, and expectations too high. Real-world tasks defeated the systems, disappointment set in, <b>funding was cut, and projects stopped</b> — the First AI Winter.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">The lasting lesson <span class="phase">Insight</span></div>
+        <h3>Stumble before success</h3>
+        <p>New technologies often stumble before they succeed. Researchers kept going; <b>faster computers, better algorithms and more data</b> eventually revived the field.</p>
+      </div>
+    </div>
+
+    <!-- ERA 3 -->
+    <div class="era reveal" id="e3">
+      <span class="era-node" style="background:var(--frost)"></span>
+      <div class="era-yr">1974 – 1987</div>
+      <h2>The Winter Deepens, Then the Expert-Systems Boom</h2>
+    </div>
+    <div class="node winter reveal">
+      <div class="card winter">
+        <div class="yr">1974 – 1980 <span class="phase">First Winter continues</span></div>
+        <h3>The Lighthill Report</h3>
+        <p>The 1973 <b>Lighthill Report</b> declares AI has failed its "grandiose objectives." UK funding collapses almost overnight; DARPA quietly scales back in the US. "Artificial intelligence" becomes a term researchers <b>avoid in grant proposals</b> — work continues under quieter names like pattern recognition and heuristic programming.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">1980 – 1987 <span class="phase">Boom</span></div>
+        <h3>The Expert-Systems Boom</h3>
+        <p><b>XCON</b> (Digital Equipment) auto-configures computer orders — rule-based AI turns a profit. Japan's <b>Fifth Generation Project</b> (1982) alarms Western governments; DARPA answers with the Strategic Computing Initiative (1983). By the mid-1980s the expert-systems industry is worth <span class="stat">over $1 billion a year</span>.</p>
+      </div>
+    </div>
+
+    <!-- ERA 4 -->
+    <div class="era reveal" id="e4">
+      <span class="era-node" style="background:var(--frost)"></span>
+      <div class="era-yr">1987 – 2000</div>
+      <h2>The Second AI Winter &amp; Recovery</h2>
+    </div>
+    <div class="node winter reveal">
+      <div class="card winter">
+        <div class="yr">1987 – 1993 <span class="phase">Second AI Winter</span></div>
+        <h3>The expert systems collapse</h3>
+        <p>Expert systems proved <b>expensive, rigid and hard to maintain</b>. Overhype plus funding cuts stalled the field again, and Japan's Fifth Generation project fell short (1992). Yet research quietly advanced <b>neural networks and statistical learning</b> in the background.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">1990s – 2000s <span class="phase">Recovery</span></div>
+        <h3>The web makes data — and Deep Blue wins</h3>
+        <p>Tim Berners-Lee's <b>World Wide Web</b> (1990–91) creates massive digital datasets. AI shifts from rules to data-driven ML — decision trees, Bayesian nets, statistics. <b>Support Vector Machines</b> (1995) sharpen handwriting and image recognition, and in <span class="stat">1997</span> IBM's <b>Deep Blue</b> defeats world chess champion Garry Kasparov.</p>
+      </div>
+    </div>
+
+    <!-- ERA 5 -->
+    <div class="era warm reveal" id="e5">
+      <span class="era-node"></span>
+      <div class="era-yr">2000 – 2012</div>
+      <h2>The Foundations of Modern AI</h2>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2006 <span class="phase">Infrastructure</span></div>
+        <h3>Big Data &amp; cloud computing</h3>
+        <p>The internet and social media generate enormous data. <b>Amazon Web Services</b> (2006) makes powerful computing rentable, and cheap <b>GPUs</b> join Big Data to supercharge research.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2012 <span class="phase">Revolution</span></div>
+        <h3>The Deep-Learning revolution</h3>
+        <p><b>AlexNet</b> (Hinton, Krizhevsky, Sutskever) wins the ImageNet challenge by a wide margin, proving deep neural nets beat traditional methods — and triggering huge investment from Google, Microsoft, Meta and Amazon.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">The turning point <span class="phase">Synthesis</span></div>
+        <h3>Four forces converge</h3>
+        <p>By 2012, <b>Big Data + cloud + GPUs + deep learning</b> turned AI from a research field into practical technology — the foundation for today's generative AI.</p>
+      </div>
+    </div>
+
+    <!-- ERA 6 -->
+    <div class="era warm reveal" id="e6">
+      <span class="era-node"></span>
+      <div class="era-yr">2012 – 2017</div>
+      <h2>The Deep-Learning Breakthrough</h2>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2012 <span class="phase">Vision</span></div>
+        <h3>AlexNet cracks ImageNet</h3>
+        <p>An 8-layer CNN sorts <span class="stat">1.2M images</span> into 1,000 categories, cutting top-5 error from <span class="stat">26.2% &rarr; 15.3%</span>.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2014 <span class="phase">Generation</span></div>
+        <h3>GANs &amp; DeepFace</h3>
+        <p>AI learns to <b>create, not just recognise</b> — and reaches near-human accuracy at recognising faces.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2016 <span class="phase">Mastery</span></div>
+        <h3>AlphaGo beats Lee Sedol</h3>
+        <p>It masters <b>Go</b>, long thought AI-proof, and moves past human knowledge with faster-than-human intuition.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2017 <span class="phase">Architecture</span></div>
+        <h3>The Transformer</h3>
+        <p><b>"Self-attention"</b> lets every word see every other word at once — parallel, book-length context. The architecture behind <b>all</b> major AI models that follow.</p>
+      </div>
+    </div>
+
+    <!-- ERA 7 -->
+    <div class="era warm reveal" id="e7">
+      <span class="era-node"></span>
+      <div class="era-yr">2018 – 2022</div>
+      <h2>The Rise of Large Language Models</h2>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2018 <span class="phase">Paradigm</span></div>
+        <h3>BERT &amp; GPT-1</h3>
+        <p>Pretrain a transformer on huge unlabelled text, then fine-tune cheaply — <b>"pretrain big, adapt cheap"</b> becomes the paradigm.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2020 <span class="phase">Scale</span></div>
+        <h3>GPT-3 — 175B parameters</h3>
+        <p><span class="stat">Ten times bigger</span>, it shows <b>emergent few-shot learning</b> — give it a few examples and it performs the task.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2020 – 2021 <span class="phase">Science</span></div>
+        <h3>AlphaFold2</h3>
+        <p>Solves the 50-year <b>protein-folding problem</b> at <span class="stat">92.4 GDT</span> — leading to a 2024 Nobel Prize in Chemistry.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2021 <span class="phase">Tooling</span></div>
+        <h3>GitHub Copilot</h3>
+        <p>AI coding assistance goes mainstream — <b>the LLM becomes a daily tool</b>.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2022 <span class="phase">Inflection</span></div>
+        <h3>ChatGPT</h3>
+        <p><span class="stat">1M users in 5 days</span>, <span class="stat">100M in 2 months</span> — the single biggest moment in AI history.</p>
+      </div>
+    </div>
+
+    <!-- ERA 8 -->
+    <div class="era warm reveal" id="e8">
+      <span class="era-node"></span>
+      <div class="era-yr">2023 – 2026</div>
+      <h2>The Age of Agentic AI</h2>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2023 <span class="phase">Rivalry</span></div>
+        <h3>GPT-4, Claude &amp; Gemini</h3>
+        <p>AI shifts from <b>monopoly to rivalry</b> — and the scale of investment surges.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2024 <span class="phase">Reasoning</span></div>
+        <h3>o1 reasoning &amp; Sora</h3>
+        <p>Models that <b>"think before answering"</b> plus text-to-video go mainstream; the <b>EU AI Act</b> brings the first major AI regulation.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2025 <span class="phase">Efficiency</span></div>
+        <h3>DeepSeek R1</h3>
+        <p>Matches o1 on many benchmarks at <span class="stat">~95% lower cost</span> — and markets panic.</p>
+      </div>
+    </div>
+    <div class="node reveal">
+      <div class="card">
+        <div class="yr">2025 – 2026 <span class="phase">Agentic</span></div>
+        <h3>Agentic AI goes mainstream</h3>
+        <p>Claude, GPT-5.x and Gemini 3 plan <b>multi-step tasks in real production</b> — Salesforce alone reports <span class="stat">$800M in agent revenue</span>.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- QUOTE -->
+<section class="quote">
+  <div class="wrap reveal">
+    <div class="vp">
+      <div class="glow"></div>
+      <span class="tag">Quote of the day</span>
+      <blockquote>"AI is not just about replicating human intelligence; it's about <b>creating intelligent systems that can surpass human limitations</b>."</blockquote>
+      <cite>— Yann LeCun</cite>
+    </div>
+  </div>
+</section>
+
+<!-- REFERENCES -->
+<section class="refs" id="refs">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">Sources</span>
+      <h2>References</h2>
+    </div>
+    <div class="reflist reveal">
+      <a href="https://medium.com/@mariam22.ibekwe/the-ai-winter-94703b91709d" target="_blank" rel="noopener"><span class="n">01</span><span class="u">medium.com — The AI Winter</span></a>
+      <a href="https://www.historyofdatascience.com/ai-winter-the-highs-and-lows-of-artificial-intelligence/" target="_blank" rel="noopener"><span class="n">02</span><span class="u">historyofdatascience.com — The Highs and Lows of AI</span></a>
+      <a href="https://ourworldindata.org/brief-history-of-ai" target="_blank" rel="noopener"><span class="n">03</span><span class="u">ourworldindata.org — A Brief History of AI</span></a>
+      <a href="https://claude.ai/new" target="_blank" rel="noopener"><span class="n">04</span><span class="u">claude.ai</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSER -->
+<section class="closer">
+  <div class="wrap reveal">
+    <div class="eyebrow">A History of Artificial Intelligence</div>
+    <h2>Thank You</h2>
+    <p>From one man's question in 1950 to systems that act on our behalf in 2026 — the field survived two winters to get here.</p>
+    <a class="back-btn" href="index.html">&larr; Back to portfolio</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Ahmeed Akinlade</span>
+    <span>A History of Artificial Intelligence · 1950 — 2026</span>
+  </div>
+</footer>
+
+<script>
+  // reveal on scroll
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // scroll progress bar + spine fill + active nav
+  const bar=document.getElementById('scrollbar');
+  const fill=document.getElementById('spinefill');
+  const spine=document.querySelector('.spine');
+  const eras=[...document.querySelectorAll('.era')];
+  const links=[...document.querySelectorAll('#navlinks a')];
+  let ticking=false;
+  function onScroll(){
+    const st=window.scrollY, dh=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.width=(dh>0?(st/dh*100):0)+'%';
+    // spine fill: how far viewport-middle has traveled through the spine
+    if(spine){
+      const r=spine.getBoundingClientRect();
+      const total=r.height;
+      const passed=Math.min(Math.max(window.innerHeight*0.5 - r.top,0),total);
+      fill.style.height=passed+'px';
+    }
+    // active nav (last era whose top is above 40% viewport)
+    let active=null;
+    for(const e of eras){ if(e.getBoundingClientRect().top < window.innerHeight*0.4) active=e; }
+    links.forEach(l=>l.classList.remove('active'));
+    if(active){ const id=active.id; const link=links.find(l=>l.getAttribute('href')==='#'+id); if(link) link.classList.add('active'); }
+    ticking=false;
+  }
+  window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(onScroll);ticking=true;}},{passive:true});
+  window.addEventListener('resize',onScroll); onScroll();
+
+  // ambient neural-node canvas (hero only) — respects reduced motion
+  (function(){
+    const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    const canvas=document.getElementById('ambient');
+    const hero=document.querySelector('.hero');
+    if(!canvas||!hero) return;
+    const ctx=canvas.getContext('2d');
+    let w,h,nodes,raf,running=true;
+    function size(){
+      const dpr=Math.min(window.devicePixelRatio||1,2);
+      w=hero.clientWidth; h=hero.clientHeight;
+      canvas.width=w*dpr; canvas.height=h*dpr;
+      canvas.style.width=w+'px'; canvas.style.height=h+'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    function init(){
+      const count=Math.min(46,Math.floor(w*h/22000));
+      nodes=Array.from({length:count},()=>({
+        x:Math.random()*w, y:Math.random()*h,
+        vx:(Math.random()-.5)*.18, vy:(Math.random()-.5)*.18,
+        r:Math.random()*1.6+1
+      }));
+    }
+    function frame(){
+      ctx.clearRect(0,0,w,h);
+      for(let i=0;i<nodes.length;i++){
+        const a=nodes[i];
+        a.x+=a.vx; a.y+=a.vy;
+        if(a.x<0||a.x>w)a.vx*=-1; if(a.y<0||a.y>h)a.vy*=-1;
+        for(let j=i+1;j<nodes.length;j++){
+          const b=nodes[j], dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy);
+          if(d<128){
+            ctx.strokeStyle='rgba(107,43,87,'+(0.14*(1-d/128))+')';
+            ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+          }
+        }
+      }
+      for(const n of nodes){
+        ctx.fillStyle='rgba(162,62,134,.5)';
+        ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2); ctx.fill();
+      }
+      if(running) raf=requestAnimationFrame(frame);
+    }
+    size(); init();
+    if(reduce){ frame(); /* single static render */ }
+    else { frame();
+      window.addEventListener('resize',()=>{size();init();});
+      // pause when hero scrolled out of view
+      new IntersectionObserver(([e])=>{
+        running=e.isIntersecting;
+        if(running){raf=requestAnimationFrame(frame);} else {cancelAnimationFrame(raf);}
+      },{threshold:0}).observe(hero);
+    }
+  })();
+</script>
+</body>
+</html>
