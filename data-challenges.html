@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>When the Data Is the Problem — Three ML Failure Modes</title>
+<meta name="description" content="Reasoning through three real-world machine learning failure modes — missing data, model drift, and fairness-constrained learning on noisy, imbalanced labels. By Ahmeed Akinlade.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4F2EC;
+    --card:#FCFBF8;
+    --ink:#16151B;
+    --muted:#6E6A73;
+    --plum:#6B2B57;
+    --orchid:#A23E86;
+    --line:#E4DFD5;
+    --pos:#2E9E6B;
+    --neg:#B4553F;
+    --s1:#6B2B57;
+    --s2:#8A3470;
+    --s3:#A23E86;
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:"Inter",system-ui,sans-serif;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+  a{color:inherit}
+  img{max-width:100%;display:block}
+
+  .tag{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--plum);display:inline-flex;align-items:center;gap:8px}
+  .tag::before{content:"";width:22px;height:1px;background:var(--plum);display:inline-block}
+
+  h1,h2,h3{font-family:"Fraunces",serif;font-weight:500;line-height:1.08;letter-spacing:-.01em;text-wrap:balance}
+
+  .scrollbar{position:fixed;top:0;left:0;height:3px;width:0;z-index:50;background:linear-gradient(90deg,var(--plum),var(--orchid));transition:width .1s linear}
+
+  header.nav{position:sticky;top:0;z-index:30;background:rgba(244,242,236,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:20px}
+  .brand{font-family:"JetBrains Mono",monospace;font-size:14px;letter-spacing:.02em;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:9px;white-space:nowrap}
+  .brand b{color:var(--plum)}
+  .brand .back{color:var(--muted);transition:color .2s}
+  .brand:hover .back{color:var(--plum)}
+  .navlinks{display:flex;gap:22px;font-size:13.5px}
+  .navlinks a{text-decoration:none;color:var(--muted);transition:color .2s;font-family:"JetBrains Mono",monospace;letter-spacing:.02em}
+  .navlinks a:hover,.navlinks a.active{color:var(--plum)}
+  @media(max-width:900px){.navlinks{display:none}}
+
+  /* hero */
+  .hero{padding:88px 0 64px;border-bottom:1px solid var(--line)}
+  .hero h1{font-size:clamp(2.4rem,6vw,4.2rem);margin:22px 0 18px;max-width:15ch}
+  .hero h1 em{font-style:normal;color:var(--plum)}
+  .hero .sub{font-family:"JetBrains Mono",monospace;font-size:clamp(13px,2.2vw,15px);letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+  .hero .lede{font-size:1.16rem;color:var(--muted);max-width:58ch;margin:26px 0 40px}
+  .hero .lede b{color:var(--ink);font-weight:600}
+
+  /* escalation rail in hero */
+  .rail{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:24px}
+  .rail .step{display:flex;flex-direction:column;gap:9px}
+  .rail .n{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+  .rail .step:nth-child(1) .n{color:var(--s1)}
+  .rail .step:nth-child(2) .n{color:var(--s2)}
+  .rail .step:nth-child(3) .n{color:var(--s3)}
+  .rail .t{font-size:15px;font-weight:600;line-height:1.35}
+  .rail .d{font-size:13.5px;color:var(--muted);line-height:1.5}
+  .rail .bar{height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+  .rail .bar i{display:block;height:100%;border-radius:2px}
+  .rail .step:nth-child(1) .bar i{width:25%;background:var(--s1)}
+  .rail .step:nth-child(2) .bar i{width:50%;background:var(--s2)}
+  .rail .step:nth-child(3) .bar i{width:100%;background:var(--s3)}
+  @media(max-width:760px){.rail{grid-template-columns:1fr;gap:22px}}
+
+  section{padding:60px 0;border-top:1px solid var(--line)}
+  .sec-head{margin-bottom:30px}
+  .sec-head h2{font-size:clamp(1.7rem,3.4vw,2.4rem);margin-top:12px}
+  .sec-head p{color:var(--muted);max-width:62ch;margin-top:12px}
+
+  /* spine table */
+  .matrix-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px}
+  table.matrix{width:100%;border-collapse:collapse;min-width:720px;background:var(--card)}
+  table.matrix th,table.matrix td{padding:16px 20px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+  table.matrix tr:last-child td{border-bottom:none}
+  table.matrix thead th{font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;background:var(--paper);color:var(--muted)}
+  table.matrix thead th.c-bad{color:var(--neg)}
+  table.matrix thead th.c-real{color:var(--pos)}
+  table.matrix td{font-size:14.5px;line-height:1.55;color:var(--muted)}
+  table.matrix td b{color:var(--ink);font-weight:600}
+  table.matrix td.dim{width:20%}
+  table.matrix td.dim .lbl{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px}
+  table.matrix tr:nth-child(1) td.dim .lbl{color:var(--s1)}
+  table.matrix tr:nth-child(2) td.dim .lbl{color:var(--s2)}
+  table.matrix tr:nth-child(3) td.dim .lbl{color:var(--s3)}
+  table.matrix col.col-real{background:rgba(46,158,107,.045)}
+
+  /* scenario */
+  .case-head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+  .badge{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:2px;color:#fff;white-space:nowrap;margin-top:6px}
+  .case.s1 .badge{background:var(--s1)}
+  .case.s2 .badge{background:var(--s2)}
+  .case.s3 .badge{background:var(--s3)}
+  .case h2{font-size:clamp(1.6rem,3.2vw,2.2rem);max-width:28ch}
+  .case .method{font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.03em;margin-top:6px}
+  .case.s1 .method{color:var(--s1)}
+  .case.s2 .method{color:var(--s2)}
+  .case.s3 .method{color:var(--s3)}
+
+  /* complexity meter */
+  .meter{display:flex;align-items:center;gap:10px;margin-top:14px}
+  .meter .dots{display:flex;gap:5px}
+  .meter .dots span{width:9px;height:9px;border-radius:2px;background:var(--line)}
+  .case.s1 .meter .dots span.on{background:var(--s1)}
+  .case.s2 .meter .dots span.on{background:var(--s2)}
+  .case.s3 .meter .dots span.on{background:var(--s3)}
+  .meter .mlabel{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+  .application{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--plum);border-radius:4px;padding:22px 26px;margin:24px 0 26px}
+  .case.s1 .application{border-left-color:var(--s1)}
+  .case.s2 .application{border-left-color:var(--s2)}
+  .case.s3 .application{border-left-color:var(--s3)}
+  .application .k{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--plum);margin-bottom:10px}
+  .case.s1 .application .k{color:var(--s1)}
+  .case.s2 .application .k{color:var(--s2)}
+  .case.s3 .application .k{color:var(--s3)}
+  .application p{color:var(--muted);max-width:72ch}
+  .application p + p{margin-top:12px}
+  .application p b{color:var(--ink);font-weight:600}
+  .application .egs{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .application .eg{font-family:"JetBrains Mono",monospace;font-size:12px;background:var(--paper);border:1px solid var(--line);padding:5px 11px;border-radius:2px}
+
+  /* two-panel contrast */
+  .verdict{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:34px}
+  @media(max-width:760px){.verdict{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:24px}
+  .panel.fit{border-top:3px solid var(--pos)}
+  .panel.nofit{border-top:3px solid var(--neg)}
+  .panel .phead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .panel .mark{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff}
+  .panel.fit .mark{background:var(--pos)}
+  .panel.nofit .mark{background:var(--neg)}
+  .panel h3{font-size:1.12rem;font-weight:600;font-family:"Inter";letter-spacing:0}
+  .panel.fit h3{color:var(--pos)}
+  .panel.nofit h3{color:var(--neg)}
+  .panel .quote{font-size:15px;color:var(--ink);font-weight:600;margin-bottom:14px;line-height:1.45}
+  .panel p{font-size:15px;line-height:1.6;color:var(--muted)}
+  .panel p + p{margin-top:12px}
+  .panel p b{color:var(--ink);font-weight:600}
+
+  /* moves list */
+  .block-k{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .moves{list-style:none;display:flex;flex-direction:column;gap:16px;margin-bottom:34px}
+  .moves li{position:relative;padding-left:30px;font-size:15.5px;line-height:1.6;color:var(--muted);max-width:74ch}
+  .moves li b{color:var(--ink);font-weight:600}
+  .moves li::before{counter-increment:mv;content:counter(mv);position:absolute;left:0;top:2px;width:20px;height:20px;border-radius:50%;
+    font-family:"JetBrains Mono",monospace;font-size:10.5px;font-weight:500;display:grid;place-items:center;color:#fff}
+  .moves{counter-reset:mv}
+  .case.s1 .moves li::before{background:var(--s1)}
+  .case.s2 .moves li::before{background:var(--s2)}
+  .case.s3 .moves li::before{background:var(--s3)}
+
+  /* under pressure */
+  .probe{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start;margin-bottom:34px}
+  @media(max-width:860px){.probe{grid-template-columns:1fr}}
+  .probe .q{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:20px 22px;margin-bottom:18px}
+  .probe .q .who{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .probe .q p{font-size:15px;line-height:1.55;color:var(--ink);font-style:italic}
+  .probe .a p{font-size:15.5px;line-height:1.62;color:var(--muted)}
+  .probe .a p + p{margin-top:12px}
+  .probe .a p b{color:var(--ink);font-weight:600}
+
+  /* evidence figure */
+  figure{margin:0}
+  figure img{width:100%;border:1px solid var(--line);border-radius:5px;background:#1E1E1E}
+  figcaption{font-family:"JetBrains Mono",monospace;font-size:11.5px;line-height:1.5;color:var(--muted);margin-top:10px;letter-spacing:.01em}
+
+  /* principle callout */
+  .principle{border-top:1px solid var(--line);padding-top:26px;display:flex;gap:18px;align-items:flex-start}
+  .principle .pk{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;padding-top:7px}
+  .case.s1 .principle .pk{color:var(--s1)}
+  .case.s2 .principle .pk{color:var(--s2)}
+  .case.s3 .principle .pk{color:var(--s3)}
+  .principle blockquote{font-family:"Fraunces",serif;font-size:clamp(1.15rem,2.4vw,1.5rem);line-height:1.36;max-width:36ch}
+  .principle blockquote b{font-weight:600}
+  @media(max-width:640px){.principle{flex-direction:column;gap:10px}.principle .pk{padding-top:0}}
+
+  /* thesis pull */
+  .thesis .vp{background:var(--plum);color:#F4F2EC;border-radius:4px;padding:56px 48px;position:relative;overflow:hidden}
+  .thesis .tag{color:#E9B8D6}
+  .thesis .tag::before{background:#E9B8D6}
+  .thesis blockquote{font-family:"Fraunces",serif;font-weight:400;font-size:clamp(1.4rem,3.2vw,2.1rem);line-height:1.34;margin-top:20px;max-width:30ch;position:relative}
+  .thesis blockquote b{color:#fff;font-weight:600}
+  .thesis .glow{position:absolute;right:-90px;bottom:-130px;width:360px;height:360px;background:radial-gradient(circle,var(--orchid),transparent 70%);opacity:.55}
+  @media(max-width:640px){.thesis .vp{padding:40px 26px}}
+
+  /* value prop fields */
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:34px}
+  .fields .full{grid-column:1/-1}
+  .field{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:22px 24px}
+  .field .k{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--plum);margin-bottom:10px}
+  .field .v{font-size:15.5px;line-height:1.6;color:var(--muted)}
+  .field .v b{color:var(--ink);font-weight:600}
+  @media(max-width:680px){.fields{grid-template-columns:1fr}}
+
+  .prose p{color:var(--muted);max-width:68ch;margin-bottom:16px}
+  .prose p b{color:var(--ink);font-weight:600}
+  .prose p:last-child{margin-bottom:0}
+
+  .closer{padding:84px 0 66px;text-align:center}
+  .closer .eyebrow{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--plum)}
+  .closer h2{font-size:clamp(1.9rem,4.5vw,3rem);margin:14px auto 22px;max-width:22ch}
+  .closer .back-btn{font-family:"Inter";font-size:15px;font-weight:500;text-decoration:none;padding:12px 22px;border-radius:2px;background:var(--plum);color:#fff;display:inline-flex;align-items:center;gap:9px;transition:.2s}
+  .closer .back-btn:hover{background:var(--orchid)}
+
+  footer{border-top:1px solid var(--line);padding:26px 0;font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted)}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+  .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+  :focus-visible{outline:2px solid var(--plum);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<div class="scrollbar" id="scrollbar"></div>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="back">&larr;</span> A<b>.</b>Akinlade</a>
+    <nav class="navlinks" id="navlinks">
+      <a href="#frame">The Frame</a>
+      <a href="#s1">Missing Data</a>
+      <a href="#s2">Drift</a>
+      <a href="#s3">Fairness</a>
+      <a href="#verdict">Verdict</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" style="border-top:none">
+  <div class="wrap">
+    <span class="tag">Portfolio Artifact 04 &middot; AIML-500</span>
+    <h1>When the <em>data</em> is the problem</h1>
+    <div class="sub">Three ML failure modes, one coaching session</div>
+    <p class="lede">Three progressively harder machine-learning scenarios &mdash; missing data, model drift, and fairness-constrained learning on noisy, imbalanced labels. In every one, <b>the model is fine and the data is lying</b>, and in every one the obvious fix makes it worse. Diagnosing that is a different skill from building the model.</p>
+
+    <div class="rail reveal">
+      <div class="step">
+        <div class="n">Scenario 01</div>
+        <div class="bar"><i></i></div>
+        <div class="t">Missing Data</div>
+        <div class="d">One problem. Two gaps that look identical and aren&rsquo;t.</div>
+      </div>
+      <div class="step">
+        <div class="n">Scenario 02</div>
+        <div class="bar"><i></i></div>
+        <div class="t">Data Drift</div>
+        <div class="d">Two problems, interacting. The metric shift names the cause.</div>
+      </div>
+      <div class="step">
+        <div class="n">Scenario 03</div>
+        <div class="bar"><i></i></div>
+        <div class="t">Imbalance + Noise + Fairness</div>
+        <div class="d">Four problems, compounding &mdash; under a hard constraint.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FRAME -->
+<section id="frame">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">The frame</span>
+      <h2>Every one of these has a fix that makes it worse</h2>
+      <p>This was a live coaching session with the AIML-500 Data Challenge Scenario Coach &mdash; closer to a technical interview than a written exercise. The coach laid out a scenario, took the reasoning, then probed it with targeted follow-up questions before moving on. Each round had to hold up under that pressure before the next one started.</p>
+      <p>What connects all three is that the failure isn&rsquo;t in the algorithm. It&rsquo;s in what the data is quietly misrepresenting &mdash; and each scenario has a standard, reasonable-sounding remedy that compounds the underlying problem instead of fixing it.</p>
+    </div>
+
+    <div class="matrix-wrap reveal">
+      <table class="matrix">
+        <colgroup><col><col><col><col class="col-real"></colgroup>
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Symptom</th>
+            <th class="c-bad">The obvious fix</th>
+            <th class="c-real">What it actually is</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="dim"><span class="lbl">Scenario 01</span><b>Missing data</b></td>
+            <td>15% of records missing <b>last login date</b>, 8% missing <b>usage frequency</b> &mdash; missingness appears unrelated to churn.</td>
+            <td>Drop the incomplete rows, or mean-impute and move on.</td>
+            <td>Two different kinds of gap. One is a measurement error; the other is a <b>fact about the user</b>.</td>
+          </tr>
+          <tr>
+            <td class="dim"><span class="lbl">Scenario 02</span><b>Data drift</b></td>
+            <td>Fraud model precision falls <b>92% &rarr; 78%</b> over six months while recall holds steady at 85%.</td>
+            <td>Performance dropped &mdash; retrain on more recent data.</td>
+            <td>A pure <b>false-positive</b> problem from two distinct drift sources, one of which retraining alone won&rsquo;t reach.</td>
+          </tr>
+          <tr>
+            <td class="dim"><span class="lbl">Scenario 03</span><b>Imbalance + label noise + fairness</b></td>
+            <td>Only <b>3%</b> positive labels, labels themselves selection-biased and noisy, hard disparate-impact constraint.</td>
+            <td>Oversample the minority class, then check fairness at the end.</td>
+            <td><b>Reject inference</b> &mdash; the labels are a record of past policy, not of who actually defaults.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SCENARIO 1 -->
+<section id="s1" class="case s1">
+  <div class="wrap">
+    <div class="case-head reveal">
+      <span class="badge">Scenario 01</span>
+      <div>
+        <h2>Two gaps that look identical and aren&rsquo;t</h2>
+        <div class="method">Customer churn model &middot; 50,000 records</div>
+        <div class="meter">
+          <div class="dots"><span class="on"></span><span></span><span></span><span></span></div>
+          <span class="mlabel">One problem</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="application reveal">
+      <div class="k">The setup</div>
+      <p>A subscription-service churn dataset with features including account age, monthly spend, usage frequency, support tickets and last login date. <b>15% of records are missing &ldquo;last login date&rdquo;</b> and another <b>8% are missing &ldquo;usage frequency.&rdquo;</b> The missingness appears random &mdash; no obvious pattern tied to churn status.</p>
+      <div class="egs">
+        <span class="eg">MCAR / MAR</span><span class="eg">KNN imputation</span><span class="eg">MICE</span><span class="eg">Missingness indicators</span><span class="eg">Native-NaN tree models</span>
+      </div>
+    </div>
+
+    <div class="verdict reveal">
+      <div class="panel nofit">
+        <div class="phead"><span class="mark">&times;</span><h3>The obvious move</h3></div>
+        <p class="quote">&ldquo;It looks random, so just drop the incomplete rows &mdash; or mean-impute and move on.&rdquo;</p>
+        <p>Dropping costs you <b>15% + 8% of 50,000 records</b>, which is a lot of real signal to throw away on a hunch. And &ldquo;appears random&rdquo; is not the same as random: if the randomness isn&rsquo;t perfectly uniform, deletion silently introduces the exact bias it was meant to avoid.</p>
+        <p>Mean-imputing is worse in a subtler way. On a skewed feature it invents a center that doesn&rsquo;t exist, and on a date field it <b>fabricates an event that never happened</b> &mdash; destroying the one thing the gap was actually telling you.</p>
+      </div>
+      <div class="panel fit">
+        <div class="phead"><span class="mark">&check;</span><h3>What&rsquo;s actually going on</h3></div>
+        <p class="quote">The two gaps are not the same kind of gap.</p>
+        <p>A missing <b>usage frequency</b> is a measurement problem &mdash; the value exists, it just wasn&rsquo;t captured. That is a genuine imputation case.</p>
+        <p>A missing <b>last login date</b> may not be an error at all. It may be a fact: the user <b>never logged in</b>. That is not a hole in the data, it&rsquo;s a category &mdash; and quite possibly one of the strongest churn signals in the entire dataset. Imputing it destroys the signal; encoding it preserves it.</p>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div class="block-k">My approach</div>
+      <ol class="moves">
+        <li><b>Rejected wholesale row deletion.</b> Too much signal lost, and bias risk remains even under apparent randomness.</li>
+        <li><b>Treated the two features differently by type.</b> Median or KNN/regression imputation for the skewed numeric usage-frequency feature &mdash; explicitly not the mean, given the skew. For the temporal feature, investigate the &ldquo;never logged in&rdquo; hypothesis <em>before</em> imputing anything, and encode it as its own category if it holds.</li>
+        <li><b>Added binary <code>was_missing</code> indicator columns for both features</b> regardless of the imputation choice, so the model can still learn from the pattern of missingness even where it looked random on the surface.</li>
+        <li><b>Proposed tree-based models</b> (XGBoost / LightGBM) that handle missing values natively, to compare against the imputed baseline rather than assuming imputation is the better path.</li>
+      </ol>
+    </div>
+
+    <div class="probe reveal">
+      <div class="a">
+        <div class="block-k">Under pressure</div>
+        <div class="q">
+          <div class="who">Coach</div>
+          <p>&ldquo;You mentioned checking whether &lsquo;last login date&rsquo; missing means &lsquo;never logged in&rsquo; &mdash; how would you verify that? And when might you consider MICE or multiple imputation instead of just median/KNN?&rdquo;</p>
+        </div>
+        <p>On verification: <b>cross-check against account age and cumulative usage.</b> A record with near-zero usage frequency and no support tickets since signup, paired with an account creation date, is consistent with a user who registered and never engaged. I&rsquo;d also check whether IT or product logs carry a separate &ldquo;first login&rdquo; event to confirm against, and whether the missingness rate correlates with account age &mdash; concentration among very new accounts would support the hypothesis.</p>
+        <p>On MICE: escalate when the feature <b>correlates with other variables</b> (monthly spend, support tickets) in ways a single-pass median or KNN won&rsquo;t capture, or when underestimating variance is a real risk. MICE preserves relationships across features and yields multiple plausible estimates &mdash; which matters if the dataset will be used for <b>inference and uncertainty quantification</b>, not just point prediction.</p>
+      </div>
+      <figure>
+        <img src="assets/s1-probe.png" alt="The coach responds to the missing-data approach and asks two follow-up questions about verifying the never-logged-in hypothesis and when to escalate to MICE.">
+        <figcaption>The coach probes the Scenario 1 reasoning before advancing &mdash; verification method and imputation escalation. (SchoolAI &middot; AIML-500 Data Challenge Scenario Coach)</figcaption>
+      </figure>
+    </div>
+
+    <div class="principle reveal">
+      <div class="pk">The principle</div>
+      <blockquote>Missingness is data. Before you impute a value, ask whether <b>the absence is the value</b>.</blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- SCENARIO 2 -->
+<section id="s2" class="case s2">
+  <div class="wrap">
+    <div class="case-head reveal">
+      <span class="badge">Scenario 02</span>
+      <div>
+        <h2>The shape of the drop names the cause</h2>
+        <div class="method">Fraud detection model &middot; six months in production</div>
+        <div class="meter">
+          <div class="dots"><span class="on"></span><span class="on"></span><span></span><span></span></div>
+          <span class="mlabel">Two problems, interacting</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="application reveal">
+      <div class="k">The setup</div>
+      <p>A deployed online-payments fraud model launched at <b>92% precision and 87% recall</b>. Six months later precision has fallen to <b>78%</b> while recall has stayed effectively stable at <b>85%</b>.</p>
+      <p>Monitoring shows the transaction-amount distribution has shifted &mdash; more high-value transactions (&gt; $5,000) than during training &mdash; and a new payment method, <b>cryptocurrency, now accounts for 12% of volume but was absent from the training data entirely</b>.</p>
+      <div class="egs">
+        <span class="eg">Covariate shift</span><span class="eg">Population Stability Index</span><span class="eg">KL divergence</span><span class="eg">Segmented evaluation</span><span class="eg">Cost-weighted thresholds</span>
+      </div>
+    </div>
+
+    <div class="verdict reveal">
+      <div class="panel nofit">
+        <div class="phead"><span class="mark">&times;</span><h3>The obvious move</h3></div>
+        <p class="quote">&ldquo;Performance dropped &mdash; retrain the model on more recent data.&rdquo;</p>
+        <p>Retraining is probably <em>part</em> of the answer, but reaching for it first skips the diagnosis entirely. You don&rsquo;t yet know which segment is producing the false positives, so you can&rsquo;t tell whether the fix is more data, a recalibrated threshold, a missing feature, or a category the model has never encountered.</p>
+        <p>Worse, retraining on drifted production data <b>without accurate crypto fraud labels reproduces the same blind spot</b> &mdash; you get a freshly trained model with the identical structural gap, and six months later you're back here.</p>
+      </div>
+      <div class="panel fit">
+        <div class="phead"><span class="mark">&check;</span><h3>What&rsquo;s actually going on</h3></div>
+        <p class="quote">Recall held. Only precision moved. That pattern is a fingerprint.</p>
+        <p>Stable recall means the model is <b>still catching the fraud it always caught</b>. Falling precision means it is now flagging far more legitimate transactions. This is a rising false-positive problem &mdash; not a missed-fraud problem &mdash; and that distinction points at the cause.</p>
+        <p>Two drift sources produce it. High-value transactions were <b>underrepresented in training</b>, so the model over-associates &ldquo;large amount&rdquo; with fraud and now over-flags them as they become common. And <b>crypto is an entirely unseen category</b> &mdash; the model has no learned behaviour for it and defaults to treating it as anomalous.</p>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div class="block-k">My approach</div>
+      <ol class="moves">
+        <li><b>Read the metric pattern first.</b> Stable recall with falling precision localises the failure to false positives before touching any code.</li>
+        <li><b>Traced it to two distinct drift sources</b> rather than one: distribution shift in transaction amount, and an unseen category with no learned behaviour at all. These need different remedies.</li>
+        <li><b>Proposed a concrete diagnostic sequence.</b> Segment precision and recall by payment method and by amount bucket to confirm where the false positives concentrate; run a distribution-shift check (PSI or KL divergence) on amount and payment method between training and production to quantify the drift; inspect the false-positive cases directly to see whether they cluster in those segments.</li>
+        <li><b>Remediated per source.</b> Retrain on recent data with representative volumes of both segments and accurate labels; treat payment method as a first-class feature; recalibrate decision thresholds <b>per segment</b> rather than using one global cutoff; and add ongoing drift monitoring with PSI alerts so this surfaces in weeks rather than six months.</li>
+      </ol>
+    </div>
+
+    <div class="probe reveal">
+      <div class="a">
+        <div class="block-k">Under pressure</div>
+        <div class="q">
+          <div class="who">Coach</div>
+          <p>&ldquo;You mentioned a separate model for crypto &mdash; what are the tradeoffs, and when would you choose that over a single model with payment method as a feature? And how would you determine the new thresholds? What would you optimise for?&rdquo;</p>
+        </div>
+        <p>On architecture: a <b>single model with payment method as a feature is operationally simpler</b> &mdash; one pipeline, one deployment, one monitoring setup &mdash; and it lets the model share general fraud signals across segments, since things like velocity and geolocation mismatch likely apply everywhere. I&rsquo;d default to it unless crypto fraud has a structurally different signal set (wallet reputation, blockchain-specific patterns, absent chargeback dynamics) that would dilute both segments if forced into one feature space.</p>
+        <p>The deciding constraint here is data, not elegance: at <b>12% of volume and presumably far fewer confirmed fraud cases</b>, there isn&rsquo;t enough labelled crypto fraud to train a separate model well. So start single-model-plus-feature, and split later only if segmented residual analysis shows crypto behaves fundamentally differently even after the feature is added.</p>
+        <p>On thresholds: optimise <b>per segment against business cost</b>, not a global metric &mdash; a cost-weighted precision-recall curve or expected-value calculation, since a $50 crypto transaction and a $10,000 wire have very different false-negative costs. Validate on a recent, representative holdout before deploying.</p>
+      </div>
+      <figure>
+        <img src="assets/s2-probe.png" alt="The coach confirms the drift diagnosis and asks two follow-up questions about separate-model tradeoffs and threshold selection.">
+        <figcaption>The coach pushes on the Scenario 2 remediation plan &mdash; architecture tradeoffs and what the new thresholds should optimise for. (SchoolAI &middot; AIML-500 Data Challenge Scenario Coach)</figcaption>
+      </figure>
+    </div>
+
+    <div class="principle reveal">
+      <div class="pk">The principle</div>
+      <blockquote>The shape of the degradation names the cause. Precision falling while recall holds isn&rsquo;t a model that got worse &mdash; it&rsquo;s <b>a model being asked a different question</b>.</blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- SCENARIO 3 -->
+<section id="s3" class="case s3">
+  <div class="wrap">
+    <div class="case-head reveal">
+      <span class="badge">Scenario 03</span>
+      <div>
+        <h2>When the label is a record of past policy</h2>
+        <div class="method">Small-business loan default model &middot; 200,000 applications</div>
+        <div class="meter">
+          <div class="dots"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div>
+          <span class="mlabel">Four problems, compounding</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="application reveal">
+      <div class="k">The setup</div>
+      <p>A model to identify high-risk applicants, trained on 200,000 historical applications with features including business age, revenue, industry, credit score, owner demographics, geographic region and previous repayment history. Only <b>3% of applicants actually defaulted</b>.</p>
+      <p>The labelling process itself is compromised in three ways. Certain regions had <b>historically stricter underwriting</b>, producing fewer approvals and therefore fewer observed defaults (selection bias). Some records marked &ldquo;defaulted&rdquo; were <b>strategic non-repayment</b> by businesses that had the means (label noise). And <b>repayment history is recorded only for approved applicants</b>.</p>
+      <p>On top of all of it: a hard fairness requirement. <b>No disparate impact on protected groups beyond what legitimate risk factors explain.</b></p>
+      <div class="egs">
+        <span class="eg">Reject inference</span><span class="eg">Pseudo-labelling</span><span class="eg">Confident learning</span><span class="eg">Cost-sensitive learning</span><span class="eg">PR-AUC</span><span class="eg">Equalised odds</span>
+      </div>
+    </div>
+
+    <div class="verdict reveal">
+      <div class="panel nofit">
+        <div class="phead"><span class="mark">&times;</span><h3>The obvious move</h3></div>
+        <p class="quote">&ldquo;3% positives &mdash; oversample the minority class with SMOTE, then run a fairness check at the end.&rdquo;</p>
+        <p>SMOTE synthesises new minority examples <b>from the labels you already have</b> &mdash; and those labels are selection-biased and noisy. You would be manufacturing additional copies of a distorted signal, amplifying both problems at once while the accuracy number looks better.</p>
+        <p>And treating fairness as a final checkpoint mistakes where the disparity lives. It is <b>already baked into the training label</b>, because approval decisions shaped which outcomes were ever observed. A post-hoc check can detect that; it cannot undo it.</p>
+      </div>
+      <div class="panel fit">
+        <div class="phead"><span class="mark">&check;</span><h3>What&rsquo;s actually going on</h3></div>
+        <p class="quote">This is reject inference, not missing data.</p>
+        <p>The label <em>and</em> a key feature exist only for <b>approved</b> applicants &mdash; and approval was itself shaped by historically stricter regional underwriting. So a region&rsquo;s low observed default rate may reflect <b>who was given a chance</b>, not who was actually creditworthy.</p>
+        <p>Name it wrong and every downstream fix is wrong. Call it &ldquo;missing data&rdquo; and you impute. Call it &ldquo;imbalance&rdquo; and you resample. Both take a label that encodes a past policy decision and <b>launder it into a model that looks objective</b>.</p>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div class="block-k">My approach</div>
+      <ol class="moves">
+        <li><b>Named the core problem as reject inference</b> rather than missing data &mdash; the diagnosis that determines whether everything after it is coherent.</li>
+        <li><b>Handled the selection bias explicitly.</b> Build an initial model on approved applicants, use it to score rejected applicants, and generate weighted pseudo-outcomes for the rejects &mdash; while being explicit that these are estimates, not ground truth. Flag geographic region for extra scrutiny precisely because historical policy is baked into its label distribution, rather than trusting raw regional default rates.</li>
+        <li><b>Separated label noise from genuine distress.</b> Strategic default is a different construct from inability to pay, so look for auxiliary signals that distinguish them &mdash; stable revenue and cash flow with an abrupt payment stop, versus the gradual decline typical of real financial distress. Treat the label as noisy by default and use confident-learning-style methods to surface likely-mislabelled points rather than assuming the label is clean.</li>
+        <li><b>Rejected naive oversampling.</b> No SMOTE on top of a noisy, selection-biased label. Prefer class weighting or cost-sensitive learning, evaluated with <b>PR-AUC and business-cost-weighted metrics</b> instead of raw accuracy, with stratified cross-validation.</li>
+        <li><b>Made fairness a decomposition, not a checkbox.</b> Exclude protected attributes directly, but explicitly test for proxies &mdash; geographic region being the obvious one here. Then decompose any observed disparity into the portion <b>explained by legitimate risk factors</b> versus unexplained residual disparity, and apply fairness constraints during training or post-hoc threshold adjustment by group only if unexplained disparity remains.</li>
+        <li><b>Pushed for human review and staged rollout</b> with ongoing fairness audits, rather than treating this as a one-time training problem. The label is a product of past policy decisions, and the goal is not to relaunder that bias into a new model.</li>
+      </ol>
+    </div>
+
+    <div class="probe reveal">
+      <div class="a">
+        <div class="block-k">Under pressure</div>
+        <div class="q">
+          <div class="who">Coach</div>
+          <p>&ldquo;How would you validate that those pseudo-labels are reasonable? What specific patterns distinguish &lsquo;strategic&rsquo; from &lsquo;struggling but managed&rsquo;? And what method would you use for the fairness decomposition?&rdquo;</p>
+        </div>
+        <p><b>Validating pseudo-labels:</b> hold out a small randomly-approved sample if one exists, or look for a natural experiment &mdash; a policy change that approved marginal applicants &mdash; and compare pseudo-labels against real outcomes for those edge cases. Critically, sanity-check that pseudo-labelled reject default rates by region <b>don&rsquo;t simply mirror the original underwriting policy</b>, which would mean the bias is being circularly reinforced rather than corrected. Track calibration across several retraining cycles rather than trusting the first pass.</p>
+        <p><b>Strategic vs. struggling:</b> the signature of a strategic default is <b>an abrupt stop despite stable financials</b> &mdash; revenue and cash flow steady or growing in the months before, credit score not deteriorating, the business still operating and filing revenue afterwards. &ldquo;Struggling but managed&rdquo; looks the opposite: declining revenue, rising missed or partial payments, increasing credit utilisation beforehand.</p>
+        <p><b>Fairness decomposition:</b> start with residual analysis &mdash; regress the outcome (or the model&rsquo;s predicted risk) on legitimate risk factors only, then test whether the residuals still correlate with protected group membership or its proxies. If they do, that is unexplained disparity. A causal approach conditioning on a graph of legitimate risk pathways is more rigorous, but <b>residual/regression-based decomposition is more practical and more defensible to auditors and regulators</b> &mdash; which matters in this domain.</p>
+      </div>
+      <figure>
+        <img src="assets/s3-feedback.png" alt="The coach's assessment of the Scenario 3 reasoning, listing reject inference recognition, avoidance of naive oversampling, the label-noise distinction, fairness decomposition and staged rollout.">
+        <figcaption>The coach&rsquo;s assessment of Scenario 3 &mdash; noting the treatment of the scenario as a system of interconnected problems rather than three separate fixes. (SchoolAI &middot; AIML-500 Data Challenge Scenario Coach)</figcaption>
+      </figure>
+    </div>
+
+    <div class="principle reveal">
+      <div class="pk">The principle</div>
+      <blockquote>When the label is a product of past policy, resampling amplifies the bias. The work is <b>recovering the labels you never got</b> &mdash; not rebalancing the ones you have.</blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- VERDICT -->
+<section id="verdict" class="thesis">
+  <div class="wrap reveal">
+    <div class="vp">
+      <div class="glow"></div>
+      <span class="tag">The verdict</span>
+      <blockquote>Knowing which fix is naive is a <b>different skill</b> from knowing which model to build &mdash; and it&rsquo;s the one that decides whether a system survives contact with production.</blockquote>
+    </div>
+
+    <div class="fields">
+      <div class="field">
+        <div class="k">Format</div>
+        <div class="v">A live, unscripted AI-coached reasoning session rather than a take-home assignment. Every claim was probed with follow-up questions before the coach moved on, which puts it closer to <b>a technical interview than a written exercise</b>.</div>
+      </div>
+      <div class="field">
+        <div class="k">Scope</div>
+        <div class="v">Three escalating scenarios &mdash; one isolated problem, two interacting problems, then four compounding problems under a hard fairness constraint &mdash; across churn, fraud and credit-risk domains.</div>
+      </div>
+      <div class="field full">
+        <div class="k">What it demonstrates</div>
+        <div class="v">The ability to reason about <b>real ML failure modes</b> &mdash; missing data, model drift, and fairness-constrained learning on noisy, imbalanced labels &mdash; with the judgment a working data scientist needs: knowing when a fix is naive, when a metric is misleading, and when a technically correct model is still the wrong one to ship. In all three scenarios the standard remedy was the trap, and identifying that required diagnosing the data rather than tuning the model.</div>
+      </div>
+      <div class="field full">
+        <div class="k">Connects to</div>
+        <div class="v">The same throughline as <a href="index.html#work" style="color:var(--plum);font-weight:600">Artifact 01</a>: favouring interpretable, defensible reasoning &mdash; residual analysis over black-box fairness checks, cost-weighted thresholds over raw accuracy &mdash; over whatever technique sounds most sophisticated. Matching the tool <em>and the explanation</em> to what the situation actually requires.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING EVIDENCE -->
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">Session close</span>
+      <h2>The coach&rsquo;s closing assessment</h2>
+      <p>After all three rounds, the coach&rsquo;s summary focused on the reasoning rather than the answers: treating the scenarios as interconnected systems, avoiding fixes that would compound the underlying data problems, and framing decisions in business terms &mdash; cost tradeoffs, operational constraints, staged rollout.</p>
+    </div>
+    <figure class="reveal">
+      <img src="assets/closing.png" alt="The coach's closing feedback covering validation approaches, strategic default identification and fairness decomposition.">
+      <figcaption>Closing feedback across the three implementation follow-ups. (SchoolAI &middot; AIML-500 Data Challenge Scenario Coach)</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- CLOSER -->
+<section class="closer">
+  <div class="wrap reveal">
+    <div class="eyebrow">When the data is the problem</div>
+    <h2>Diagnose the data before you tune the model.</h2>
+    <a class="back-btn" href="index.html">&larr; Back to portfolio</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>&copy; 2026 Ahmeed Akinlade</span>
+    <span>Artifact 04 &middot; ML Data Challenge Scenarios</span>
+  </div>
+</footer>
+
+<script>
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.14});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  const bar=document.getElementById('scrollbar');
+  const links=[...document.querySelectorAll('#navlinks a')];
+  const secs=links.map(l=>document.querySelector(l.getAttribute('href'))).filter(Boolean);
+  let ticking=false;
+  function onScroll(){
+    const st=window.scrollY, dh=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.width=(dh>0?(st/dh*100):0)+'%';
+    let active=null;
+    for(const s of secs){ if(s.getBoundingClientRect().top < window.innerHeight*0.4) active=s; }
+    links.forEach(l=>l.classList.remove('active'));
+    if(active){ const link=links.find(l=>l.getAttribute('href')==='#'+active.id); if(link) link.classList.add('active'); }
+    ticking=false;
+  }
+  window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(onScroll);ticking=true;}},{passive:true});
+  window.addEventListener('resize',onScroll); onScroll();
+</script>
+</body>
+</html>
