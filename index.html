@@ -3,8 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ahmeed Akinlade — DevOps Engineer &amp; Applied AI</title>
-<meta name="description" content="Professional portfolio of Ahmeed Akinlade: DevOps engineer specializing in cloud infrastructure and applied AI.">
+<title>Ahmeed Mofoluwasho Akinlade — DevOps &amp; Platform Engineer | Kubernetes, AWS, Azure</title>
+<meta name="description" content="DevOps and platform engineer in Atlanta. Kubernetes, Helm, Terraform, AWS and Azure — migrated 100+ production services, cut cloud spend 50%, upgraded 109 instances with zero downtime. M.S. Artificial Intelligence in progress.">
+<meta name="author" content="Ahmeed Mofoluwasho Akinlade">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Ahmeed Mofoluwasho Akinlade — DevOps &amp; Platform Engineer">
+<meta property="og:description" content="Kubernetes, Helm, Terraform, AWS and Azure. Reliability, observability, and cost at scale — plus applied AI.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"Person",
+  "name":"Ahmeed Mofoluwasho Akinlade",
+  "jobTitle":"DevOps Engineer",
+  "email":"mailto:ahmeed.akinlade1@gmail.com",
+  "telephone":"+1-929-433-6470",
+  "address":{"@type":"PostalAddress","addressLocality":"Atlanta","addressRegion":"GA","addressCountry":"US"},
+  "sameAs":["https://www.linkedin.com/in/ahmeed-mofoluwasho-akinlade-56924b291/","https://github.com/cauwe3"],
+  "alumniOf":[
+    {"@type":"CollegeOrUniversity","name":"Indiana Wesleyan University"},
+    {"@type":"CollegeOrUniversity","name":"Bentley University"},
+    {"@type":"CollegeOrUniversity","name":"Lincoln University"}
+  ],
+  "knowsAbout":["Kubernetes","Helm","Terraform","Amazon Web Services","Microsoft Azure","Ansible","CI/CD","Site Reliability Engineering","Observability","Python","Applied AI"]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -59,7 +82,13 @@
   .navlinks{display:flex;gap:26px;font-size:14px}
   .navlinks a{text-decoration:none;color:var(--muted);transition:color .2s}
   .navlinks a:hover{color:var(--ink)}
-  @media(max-width:640px){.navlinks{display:none}}
+  .navlinks a.res{
+    font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.08em;
+    color:var(--plum);border:1px solid var(--line);padding:6px 12px;border-radius:2px;
+  }
+  .navlinks a.res:hover{border-color:var(--plum);background:var(--card);color:var(--plum)}
+  @media(max-width:860px){.navlinks{gap:18px;font-size:13px}}
+  @media(max-width:700px){.navlinks a:not(.res){display:none}}
 
   /* ---- hero ---- */
   .hero{padding:88px 0 72px}
@@ -90,10 +119,95 @@
     .portrait{order:-1;max-width:220px}
   }
 
+  /* ---- availability badge ---- */
+  .avail{
+    display:inline-flex;align-items:center;gap:9px;margin-bottom:16px;
+    font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--live);
+    background:var(--card);border:1px solid var(--line);padding:6px 12px;border-radius:2px;
+  }
+
+  /* ---- impact stat band ---- */
+  .statband{background:var(--card);border-top:1px solid var(--line)}
+  .statband .wrap{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:26px;
+    padding-top:34px;padding-bottom:34px;
+  }
+  .stat{border-left:1px solid var(--line);padding-left:20px}
+  .stat .n{
+    font-family:"Fraunces",serif;font-weight:500;letter-spacing:-.02em;
+    font-size:clamp(1.8rem,3.6vw,2.5rem);line-height:1;color:var(--plum);
+  }
+  .stat .l{
+    font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);line-height:1.6;margin-top:10px;
+  }
+  @media(max-width:760px){.statband .wrap{grid-template-columns:1fr 1fr;gap:22px}}
+
   /* ---- section frame ---- */
   section{padding:64px 0;border-top:1px solid var(--line)}
   .sec-head{margin-bottom:34px}
   .sec-head h2{font-size:clamp(1.8rem,3.6vw,2.6rem);margin-top:14px}
+  .sec-head .sub{color:var(--muted);margin-top:14px;max-width:62ch;font-size:1.02rem}
+
+  /* ---- experience timeline ---- */
+  .tl{position:relative;padding-left:30px}
+  .tl::before{content:"";position:absolute;left:5px;top:10px;bottom:12px;width:1px;background:var(--line)}
+  .role{position:relative;padding-bottom:42px}
+  .role:last-child{padding-bottom:0}
+  .role::before{
+    content:"";position:absolute;left:-30px;top:9px;width:11px;height:11px;border-radius:50%;
+    background:var(--paper);border:2px solid var(--plum);
+  }
+  .role-head{display:flex;justify-content:space-between;align-items:baseline;gap:18px;flex-wrap:wrap}
+  .role h3{font-size:1.32rem}
+  .role .org{font-size:15px;font-weight:600;color:var(--plum);margin-top:5px}
+  .role .meta{
+    font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.05em;
+    color:var(--muted);white-space:nowrap;
+  }
+  .role .ctx{color:var(--muted);font-size:15px;margin-top:10px;max-width:72ch;font-style:italic}
+  .role ul,.proj ul{list-style:none;margin-top:15px;max-width:74ch}
+  .role li,.proj li{position:relative;padding-left:19px;margin-bottom:9px;font-size:15.5px;line-height:1.62}
+  .role li:last-child,.proj li:last-child{margin-bottom:0}
+  .role li::before,.proj li::before{
+    content:"";position:absolute;left:0;top:.66em;width:5px;height:5px;border-radius:50%;
+    background:var(--orchid);opacity:.65;
+  }
+  .role li b,.proj li b{font-weight:600}
+  @media(max-width:640px){.role .meta{white-space:normal}}
+
+  /* ---- engineering projects ---- */
+  .projgrid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+  .proj{
+    background:var(--card);border:1px solid var(--line);border-radius:4px;padding:30px;
+    transition:box-shadow .25s,transform .25s;
+  }
+  .proj:hover{box-shadow:0 18px 40px -24px rgba(22,21,27,.35);transform:translateY(-2px)}
+  .proj-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+  .proj h3{font-size:1.35rem}
+  .proj .stack{
+    font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--muted);
+    margin-top:8px;line-height:1.6;
+  }
+  @media(max-width:760px){.projgrid{grid-template-columns:1fr}}
+
+  /* ---- credentials ---- */
+  .credgrid{display:grid;grid-template-columns:1fr 1fr;gap:46px;margin-top:44px}
+  .credgrid h4{
+    font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--plum);font-weight:500;margin-bottom:18px;
+  }
+  .cred{margin-bottom:18px}
+  .cred:last-child{margin-bottom:0}
+  .cred .d{font-family:"Fraunces",serif;font-size:1.12rem;line-height:1.3}
+  .cred .s{font-size:14.5px;color:var(--muted);margin-top:3px}
+  .cite{
+    font-size:14.5px;line-height:1.65;color:var(--muted);
+    border-left:2px solid var(--line);padding-left:16px;
+  }
+  .cite a{color:var(--plum)}
+  @media(max-width:760px){.credgrid{grid-template-columns:1fr;gap:34px}}
 
   .prose p{margin-bottom:18px;max-width:66ch}
   .prose p:last-child{margin-bottom:0}
@@ -173,12 +287,15 @@
 
 <header class="nav">
   <div class="wrap">
-    <span class="brand">A<b>.</b>Akinlade</span>
+    <span class="brand">A<b>.</b>M<b>.</b>Akinlade</span>
     <nav class="navlinks">
       <a href="#about">About</a>
-      <a href="#value">Value</a>
-      <a href="#work">Work</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#work">Artifacts</a>
       <a href="#contact">Contact</a>
+      <a class="res" href="assets/Ahmeed_Mofoluwasho_Akinlade_Resume.pdf" target="_blank" rel="noopener">RÉSUMÉ ↓</a>
     </nav>
   </div>
 </header>
@@ -187,11 +304,13 @@
 <section class="hero" style="border-top:none">
   <div class="wrap">
     <div class="reveal">
+      <span class="avail"><span class="dot"></span> Open to DevOps · Platform · SRE roles</span>
       <span class="tag">DevOps Engineer · Applied AI</span>
-      <h1>Ahmeed<br>Akinlade</h1>
+      <h1>Ahmeed<br>Mofoluwasho<br>Akinlade</h1>
       <p class="lede">I build <b>reliable, observable cloud infrastructure</b> — and increasingly, the <b>practical AI tools</b> that put expert knowledge into everyday hands.</p>
       <div class="cta">
-        <a class="btn btn-primary" href="#work">See the work &rarr;</a>
+        <a class="btn btn-primary" href="assets/Ahmeed_Mofoluwasho_Akinlade_Resume.pdf" target="_blank" rel="noopener">Download résumé &darr;</a>
+        <a class="btn btn-ghost" href="#experience">See the work &rarr;</a>
         <a class="btn btn-ghost" href="#contact">Get in touch</a>
       </div>
     </div>
@@ -200,6 +319,28 @@
     </div>
   </div>
 </section>
+
+<!-- IMPACT STATS -->
+<div class="statband">
+  <div class="wrap reveal">
+    <div class="stat">
+      <div class="n">100+</div>
+      <div class="l">Production services<br>migrated Helm 2 &rarr; 3</div>
+    </div>
+    <div class="stat">
+      <div class="n">50%</div>
+      <div class="l">Azure AKS<br>cost reduction</div>
+    </div>
+    <div class="stat">
+      <div class="n">109</div>
+      <div class="l">EC2 instances upgraded<br>zero downtime</div>
+    </div>
+    <div class="stat">
+      <div class="n">5+</div>
+      <div class="l">Years across<br>AWS &amp; Azure platforms</div>
+    </div>
+  </div>
+</div>
 
 <!-- ABOUT / BIO -->
 <section id="about">
@@ -227,12 +368,206 @@
   </div>
 </section>
 
+<!-- PROFESSIONAL EXPERIENCE -->
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">Professional Experience</span>
+      <h2>Where I've done it</h2>
+      <p class="sub">Five-plus years operating production cloud platforms — the recurring assignment has been making large, risky changes safely, and leaving the system cheaper and more observable than I found it.</p>
+    </div>
+
+    <div class="tl">
+      <div class="role reveal">
+        <div class="role-head">
+          <div>
+            <h3>DevOps Engineer</h3>
+            <div class="org">EvidentID</div>
+          </div>
+          <div class="meta">Atlanta, GA · Mar 2024 – Apr 2026</div>
+        </div>
+        <ul>
+          <li>Executed a <b>zero-downtime Helm 2 to Helm 3 migration across 100+ production services</b> — upgrading Helm binaries on Jenkins and GitHub Actions runners, rewriting Ansible roles and playbooks, and republishing all charts to Artifactory.</li>
+          <li>Migrated Python microservices from AWS EC2 to <b>Azure Kubernetes Service</b>, containerizing each service and authoring parameterized Helm charts for consistent, repeatable deployments across environments.</li>
+          <li><b>Reduced Azure AKS reservation costs by 50%</b> by migrating three clusters to memory-optimized E4as_v7 VMs and configuring Terraform autoscaling policies to burst onto cost-efficient D4as_v7 nodes.</li>
+          <li>Upgraded <b>109 EC2 instances from Ubuntu 18/20 to Ubuntu 24 with zero downtime</b>, using blue-green deployments orchestrated end-to-end through Ansible.</li>
+          <li>Automated support data-retrieval workflows with Python Lambda functions triggered by Jira webhooks, <b>removing DevOps from the ticket path</b> and significantly reducing turnaround time.</li>
+          <li>Operated platform observability across <b>CloudWatch, Sentry, and Logz.io</b>, using log and metric analysis to isolate and resolve incidents and reduce mean time to resolution.</li>
+          <li>Built dashboards for real-time resource tracking and capacity oversight, informing scaling and deployment decisions across the engineering organization.</li>
+        </ul>
+      </div>
+
+      <div class="role reveal">
+        <div class="role-head">
+          <div>
+            <h3>DevOps Engineer — MyHealthNote Research Platform</h3>
+            <div class="org">Bentley University</div>
+          </div>
+          <div class="meta">Waltham, MA · Sep 2021 – Dec 2022</div>
+        </div>
+        <p class="ctx">Cloud infrastructure lead on a research initiative under Dr. Sandeep Purao, delivering a live cross-platform healthcare application supporting elderly self-care in urban communities (myhealthnotes.us).</p>
+        <ul>
+          <li>Provisioned and operated <b>AWS infrastructure (EC2, S3, RDS for MySQL)</b> for a publicly accessible production research platform.</li>
+          <li>Built CI/CD pipelines in Jenkins and GitHub Actions, automating builds and deployments and <b>eliminating manual release steps</b>.</li>
+          <li>Containerized services with Docker and deployed via AWS ECS for fault-tolerant, horizontally scalable operation.</li>
+          <li>Authored Infrastructure-as-Code templates in <b>Terraform and CloudFormation</b> for consistent, reproducible environment provisioning.</li>
+          <li>Instrumented monitoring and logging with AWS CloudWatch and custom logging agents to track application and infrastructure performance.</li>
+        </ul>
+      </div>
+
+      <div class="role reveal">
+        <div class="role-head">
+          <div>
+            <h3>Business Intelligence Analyst, Intern</h3>
+            <div class="org">Bill.com</div>
+          </div>
+          <div class="meta">San Jose, CA · May 2022 – Aug 2022</div>
+        </div>
+        <ul>
+          <li>Built <b>Tableau and SQL dashboards</b> measuring recruiting-team performance, giving Talent Acquisition leadership visibility into pipeline bottlenecks and process gaps.</li>
+          <li>Contributed to the development of a company-wide data governance framework.</li>
+        </ul>
+      </div>
+
+      <div class="role reveal">
+        <div class="role-head">
+          <div>
+            <h3>Software Engineer Intern &amp; Teaching Assistant</h3>
+            <div class="org">Lincoln University</div>
+          </div>
+          <div class="meta">Oxford, PA · Jan 2018 – Aug 2020</div>
+        </div>
+        <ul>
+          <li>Built the backend for <b>Ashmun Express</b>, a mobile study application for early-career STEM majors: designed the MySQL schema and REST APIs deployed on Heroku, <b>improving web server response time by ~5%</b> through API-level authentication and query optimization. Work published in the ASEE Annual Conference Proceedings.</li>
+          <li>Tutored an average of 15 students daily in algebra, statistics, precalculus, and calculus.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ENGINEERING PROJECTS -->
+<section id="projects">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">Technical Projects</span>
+      <h2>What I build on my own time</h2>
+      <p class="sub">Two builds that sit on either side of my current focus: a shipped applied-AI product, and a self-managed cluster for prototyping platform patterns outside production constraints.</p>
+    </div>
+
+    <div class="projgrid">
+      <div class="proj reveal">
+        <div class="proj-head">
+          <div>
+            <h3>Imvlar</h3>
+            <div class="org" style="font-size:14px;font-weight:600;color:var(--plum);margin-top:5px">Audio-First AI Learning Platform · 2026</div>
+          </div>
+          <a class="live" href="https://imvlar.vercel.app" target="_blank" rel="noopener">
+            <span class="dot"></span> LIVE
+          </a>
+        </div>
+        <div class="stack">Next.js 16 · React 19 · TypeScript · Vercel AI SDK · Anthropic Claude · OpenAI · Web Audio API</div>
+        <ul>
+          <li>Built a full-stack real-time voice learning application closing a <b>speech-to-text → streaming-LLM → text-to-speech loop</b>, letting users consume technical content hands-free and interrupt by voice to ask questions.</li>
+          <li>Engineered a streaming sentence-level TTS pipeline using a producer/consumer pattern that detects sentence boundaries in the live token stream, <b>cutting time-to-first-audio from ~30s to ~2–3s</b>.</li>
+          <li>Designed a two-tier intent classifier (regex fast path with Claude Haiku fallback) resolving <b>~80% of voice inputs at zero latency</b> and the remainder in ~300ms, minimizing API cost while preserving responsiveness.</li>
+          <li>Hardened async correctness with generation counters and AbortControllers to eliminate race conditions under rapid input; secured prompts against injection and unit-tested core logic with Vitest.</li>
+        </ul>
+      </div>
+
+      <div class="proj reveal">
+        <div class="proj-head">
+          <div>
+            <h3>Kubernetes Observability Stack</h3>
+            <div class="org" style="font-size:14px;font-weight:600;color:var(--plum);margin-top:5px">Personal Infrastructure Lab</div>
+          </div>
+        </div>
+        <div class="stack">Kubernetes · Prometheus · Grafana · Helm · ServiceMonitor CRDs</div>
+        <ul>
+          <li>Deployed <b>Prometheus and Grafana on a self-managed Kubernetes cluster</b> using the kube-prometheus-stack Helm chart, configuring ServiceMonitor CRDs for automatic service discovery and custom scrape targets.</li>
+          <li>Uses the cluster to prototype platform patterns outside production constraints — <b>autoscaling behavior, alerting rules, and GPU-backed inference serving</b>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS & CREDENTIALS -->
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="tag">Capabilities</span>
+      <h2>Technical toolkit</h2>
+    </div>
+
+    <div class="fields reveal">
+      <div class="field">
+        <div class="k">Cloud &amp; Infrastructure</div>
+        <div class="v"><div class="chips"><span class="chip">AWS EC2</span><span class="chip">S3</span><span class="chip">RDS</span><span class="chip">ECS</span><span class="chip">Lambda</span><span class="chip">CloudWatch</span><span class="chip">Azure AKS</span><span class="chip">Terraform</span><span class="chip">CloudFormation</span><span class="chip">Ansible</span></div></div>
+      </div>
+      <div class="field">
+        <div class="k">Containers &amp; Orchestration</div>
+        <div class="v"><div class="chips"><span class="chip">Kubernetes</span><span class="chip">Helm</span><span class="chip">Docker</span><span class="chip">AKS</span><span class="chip">EKS</span><span class="chip">ECS</span><span class="chip">Artifactory</span></div></div>
+      </div>
+      <div class="field">
+        <div class="k">CI/CD &amp; Version Control</div>
+        <div class="v"><div class="chips"><span class="chip">Jenkins</span><span class="chip">GitHub Actions</span><span class="chip">Git</span><span class="chip">Jira</span></div></div>
+      </div>
+      <div class="field">
+        <div class="k">Observability</div>
+        <div class="v"><div class="chips"><span class="chip">Prometheus</span><span class="chip">Grafana</span><span class="chip">Sentry</span><span class="chip">Logz.io</span><span class="chip">CloudWatch</span></div></div>
+      </div>
+      <div class="field">
+        <div class="k">Languages</div>
+        <div class="v"><div class="chips"><span class="chip">Python</span><span class="chip">Bash</span><span class="chip">TypeScript</span><span class="chip">JavaScript</span><span class="chip">SQL</span><span class="chip">YAML</span><span class="chip">JSON</span></div></div>
+      </div>
+      <div class="field">
+        <div class="k">Data &amp; AI</div>
+        <div class="v"><div class="chips"><span class="chip">Anthropic Claude API</span><span class="chip">OpenAI API</span><span class="chip">Vercel AI SDK</span><span class="chip">Tableau</span><span class="chip">MongoDB</span></div></div>
+      </div>
+    </div>
+
+    <div class="credgrid">
+      <div class="reveal">
+        <h4>Education</h4>
+        <div class="cred">
+          <div class="d">M.S., Artificial Intelligence</div>
+          <div class="s">Indiana Wesleyan University · Jun 2026 – Present</div>
+        </div>
+        <div class="cred">
+          <div class="d">M.S., Business Analytics</div>
+          <div class="s">Bentley University · GPA 3.80</div>
+        </div>
+        <div class="cred">
+          <div class="d">B.S., Computer Science</div>
+          <div class="s">Lincoln University · GPA 3.88</div>
+        </div>
+
+        <h4 style="margin-top:32px">Certifications</h4>
+        <div class="cred">
+          <div class="d">Certified Kubernetes Administrator (CKA)</div>
+          <div class="s">In progress</div>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <h4>Publication</h4>
+        <p class="cite">Smith, T. R., Safford, S. E., Iguwe, C., &amp; Akinlade, M. (2021). “Ashmun Express: A Mobile-based Study Application for STEM Students.” <em>ASEE Annual Conference and Exposition, Conference Proceedings.</em> American Society for Engineering Education. Open access — <a href="https://doi.org/10.18260/1-2--36701" target="_blank" rel="noopener">doi.org/10.18260/1-2--36701</a></p>
+
+        <h4 style="margin-top:32px">Work Authorization</h4>
+        <p class="cite">H-1B approved. Cap-subject lottery no longer applies; a transfer petition may be filed at any time of year.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- WORK / ARTIFACTS -->
 <section id="work">
   <div class="wrap">
     <div class="sec-head reveal">
       <span class="tag">Portfolio Artifacts</span>
       <h2>Selected work</h2>
+      <p class="sub">Graduate coursework in Artificial Intelligence at Indiana Wesleyan University — each artifact is a working analysis or deployed tool, documented with the objective, process, and the judgment it demonstrates.</p>
     </div>
 
     <div class="artifact reveal">
@@ -369,17 +704,23 @@
 <!-- CONTACT -->
 <section id="contact" class="contact">
   <div class="wrap reveal">
-    <h2>Let's build something reliable.</h2>
+    <div>
+      <h2>Let's build something reliable.</h2>
+      <p style="color:var(--muted);margin-top:16px;max-width:44ch">Atlanta, GA · open to DevOps, Platform, and SRE roles — remote or relocation. H-1B approved and transferable year-round.</p>
+    </div>
     <div class="clinks">
       <a href="mailto:ahmeed.akinlade1@gmail.com"><span class="lbl">email</span> ahmeed.akinlade1@gmail.com</a>
+      <a href="tel:+19294336470"><span class="lbl">phone</span> (929) 433-6470</a>
       <a href="https://www.linkedin.com/in/ahmeed-mofoluwasho-akinlade-56924b291/" target="_blank" rel="noopener"><span class="lbl">linkedin</span> /in/ahmeed-mofoluwasho-akinlade</a>
+      <a href="https://github.com/cauwe3" target="_blank" rel="noopener"><span class="lbl">github</span> /cauwe3</a>
+      <a href="assets/Ahmeed_Mofoluwasho_Akinlade_Resume.pdf" target="_blank" rel="noopener"><span class="lbl">résumé</span> download PDF ↓</a>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <span>© 2026 Ahmeed Akinlade</span>
+    <span>© 2026 Ahmeed Mofoluwasho Akinlade</span>
     <span>Portfolio · AIML · Indiana Wesleyan University</span>
   </div>
 </footer>
